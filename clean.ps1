@@ -13,13 +13,17 @@ param(
 $ErrorActionPreference = "Continue"
 Clear-Host
 
-# Try to enable UTF-8 output, fall back to ASCII if not available
-$useEmoji = -not $NoEmoji
-try {
-    chcp 65001 | Out-Null
-    [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
-} catch { }
-if ([Console]::OutputEncoding.CodePage -ne 65001) { $useEmoji = $false }
+# Emoji/encoding handling: default to ASCII on Windows PowerShell 5.x to avoid mojibake
+$useEmoji = $false
+if (-not $NoEmoji) {
+    if ($PSVersionTable.PSVersion.Major -ge 6) {
+        try { $null = (& cmd /c chcp 65001) } catch { }
+        try { [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new() } catch { }
+        $cpOut = ''
+        try { $cpOut = (& cmd /c chcp) 2>$null } catch { }
+        if ($cpOut -match '65001') { $useEmoji = $true }
+    }
+}
 
 function Get-IconMap {
     param([bool]$EnableEmoji)
@@ -188,3 +192,6 @@ Write-Color ("{0} It's safe to continue using your system - no personal files we
 Write-Color "`n$($I.tip) Tip: Run this script weekly to keep your PC fast!" -Color Magenta
 Write-Color "=========================================" -Color DarkGray
 Start-Sleep 1
+
+# Ensure success exit code even if a native tool returned non-zero earlier
+$global:LASTEXITCODE = 0
