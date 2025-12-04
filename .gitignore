@@ -1,6 +1,6 @@
-# Binaries
-*.exe
-
 # OS files
 .DS_Store
 Thumbs.db
+
+# Binaries
+*.exe
