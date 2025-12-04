@@ -164,7 +164,7 @@ foreach ($t in $targets) {
 }
 
 # Recycle Bin (current user only)
-Write-Color ("{0} Emptying Recycle Bin..." -f $I.bin) -Color Green
+Write-Color ("{0} Emptying Recycle Bin...." -f $I.bin) -Color Green
 try {
     if ($PSCmdlet.ShouldProcess("Recycle Bin", "Clear")) {
         Clear-RecycleBin -Force -ErrorAction SilentlyContinue
